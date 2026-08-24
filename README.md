@@ -1,4 +1,8 @@
+<a id="chinese"></a>
+
 # KoComic — 在 KOReader 里看拷贝漫画
+
+**中文** · [English](#english)
 
 把 [kComics](https://github.com/lxdklp/kComics)(Kindle 越狱 + πthon 的独立 Python 程序)移植成了 KOReader 插件。
 接口调用照搬原版,界面推倒重做,并且**能在线边下边看**,下载的书自带正确的阅读设置。
@@ -46,58 +50,6 @@
 
 **下载**时屏幕上显示进度,点一下可以中止;中止后已下好的图片保留,下次接着下。
 
-## 关于「每一页切得不对」
-
-这件事有两个原因,插件都处理了。
-
-### 一、KOReader 的默认缩放会把一页切成两屏
-
-KOReader 打开图片书(CBZ/PDF)时,默认缩放是**「内容 - 宽度」**:先自动裁掉白边,再把内容撑满屏幕宽度。
-漫画页通常比屏幕**瘦**一点,撑满宽度之后高度就溢出去了 —— 于是一页被切成上下两屏,
-断口正好落在画面中间,翻起来就像「随便切开的条漫」。
-
-插件生成的每一本 CBZ 都会自带一份阅读设置(写在 `.sdr` 里):**整页显示 + 一页一翻**,
-打开就是满屏一页,不用自己去菜单里调。
-
-早先下载的书没有这份设置,可以在 **设置 → 给书架里的书补上阅读设置** 一次性补上。
-
-### 二、接口给的根本不是「页」
-
-拷贝漫画的接口返回的是**随手切开的碎图**,实测三种货色:
-
-| 类型 | 实测样子 | 插件的处理 |
-|---|---|---|
-| 真条漫 | 《我獨自升級》一串 640x500,接缝处画面是连着的 | 拼回一条长图,按屏幕高度**重新裁页**;裁之前在下沿找一条空白横线,尽量不把分镜劈开 |
-| 跨页扫描 | 《進擊的學校》1477x1125 这种横的,一张图两页 | 从中间**劈成两页**,默认右半页先看(日漫顺序) |
-| 单页漫画 | 《…獻上爆炎!》899x1296 规规矩矩一页一张 | **原图直接进包**,不重新编码,不掉画质 |
-
-判型是自动的:先看长宽比像不像一页纸;不像的话再比一比**上一张的最后一行和下一张的第一行接不接得上** ——
-条漫是从一整条图上定高切下来的,接缝两行几乎一模一样(实测相似度 0.97 以上);
-分开扫的漫画页接缝对不上(实测 0.86 以下)。判错了可以在设置里手动指定。
-
-在线阅读和下载用的是同一套排版代码,所以**在线看到的分页和下下来的完全一致**。
-
-## 关于「发灰」
-
-水墨屏上漫画发灰,来源有两处,插件分别处理:
-
-**一、显示时的中间调太淡。** KOReader 对图片书的对比度(其实是伽马)默认是 **1.0**,
-也就是不做任何处理;水墨屏只有十几级灰,网点和灰底就糊成一片。
-插件现在给每本书写 **1.5**(KOReader 那个滑条往右一格),渲染时中间调会压暗:
-128 → 91,黑还是黑、白还是白,只有中间那段变实。设置里可以改成 0.8 / 1.0 / 1.5 / 2.0 / 4.0,
-改完对已下载的书用「补上阅读设置」重写一遍即可。
-
-**二、原图本身就发灰。** 有些扫描件纸不是纯白(比如 235)、墨不是纯黑(比如 40),
-整张挤在中间那段灰里。插件的**自动色阶**会数一遍直方图,把真正的黑白点(各留 0.5% 给噪点)
-重新拉满 0~255。它是**按每张图自适应**的,而且很保守:
-
-- 本来就够黑够白的图 → 不动(实测你截图那部《…獻上爆炎!》就是这种,黑白点已经是 0/255)
-- 作者故意画暗的页(全黑跨页、夜景)→ 不硬提亮
-- 几乎全白的留白页 → 不硬压黑
-
-所以对已经拉满的扫描件,真正起作用的是上面那档对比度;对发灰的扫描件,两者叠加。
-在线阅读器会自己套同一档伽马,所以**在线看到的和下下来的看起来一致**。
-
 ## 账号里的阅读进度
 
 登录之后,插件会去 `/api/v3/comic2/{漫画}/query` 读账号那边的记录(拷贝漫画 App / 网页版
@@ -117,7 +69,7 @@ KOReader 打开图片书(CBZ/PDF)时,默认缩放是**「内容 - 宽度」**:�
 ## 话末的吐槽
 
 拷贝漫画管章节评论叫「吐槽」,接口是 `/api/v3/roasts?chapter_id=…`,**免登录可读**,
-一次最多给 100 条,热门章节动辄几百条(实测《魔都精兵的奴隶》第02话有 697 条)。
+一次最多给 100 条,热门章节动辄几百条。
 
 插件默认在**每一话正文后面接上本话吐槽**:排成书页,用户名和日期一行小字,
 下面是正文,一条一条用细线隔开,右下角标「吐槽 1/2」。
@@ -208,9 +160,8 @@ python test/run_test.py scenario_ui.lua      # 只测界面骨架和设置项
 python test/run_test.py scenario_host.lua    # 只测域名自动查找
 ```
 
-主流程那套会打不少数据接口,**连着跑几遍会踩到风控**(拷贝漫画按 IP 限 comic2/chapters
-一小时左右,所有域名一起限),这时候它会明说是 210 而不是报一堆乱码;
-另外两套只打很少的接口,随时能跑。
+主流程那套会打不少数据接口,**连着跑几遍会踩到风控**(拷贝漫画按 IP 限一小时左右,
+所有域名一起限),这时候它会明说是 210 而不是报一堆乱码;另外两套只打很少的接口,随时能跑。
 
 它会拿三部真漫画各跑一遍判型(条漫 / 跨页扫描 / 单页),验证条漫重裁出来的每页正好一屏、
 单页漫画保留原图、生成的书带上了阅读设置,再走一遍在线阅读器的翻页,
@@ -222,3 +173,214 @@ python test/run_test.py scenario_host.lua    # 只测域名自动查找
 ## 许可证
 
 移植自 kComics(作者 lxdklp,GPL-3.0),因此本插件同样以 **GPL-3.0** 发布,见 `LICENSE`。
+
+---
+
+<a id="english"></a>
+
+# KoComic — Read CopyManga in KOReader
+
+[中文](#chinese) · **English**
+
+A KOReader plugin ported from [kComics](https://github.com/lxdklp/kComics), a standalone Python
+program for jailbroken Kindles running πthon. The API calls follow the original, the UI was rebuilt
+from scratch, it can **stream a chapter while you read it**, and every downloaded book ships with the
+right reading settings baked in.
+
+## How it differs from the original
+
+| | kComics (original) | KoComic (this plugin) |
+|---|---|---|
+| Runs on | Jailbroken Kindle + πthon (firmware 5.16.3+) | Anything that runs KOReader (Kindle / Kobo / Android…) |
+| Reading | Whole chapter must finish downloading first | **Streams as you read**, or download to CBZ for offline |
+| Output | Converted to MOBI, pushed into the Kindle library | CBZ + reading settings, opens straight in KOReader |
+| Layout | Hard-converted to the Kindle's resolution | Detects webtoon / double-page scan / single-page manga and handles each |
+| Look | As-is | Auto levels to kill the grey, plus a per-book contrast setting |
+| Account | Favourites only | Shows the account's reading progress in favourites and chapter lists |
+| Comments | Not visible | Appends the chapter's roasts after each chapter |
+| Domain rotation | Edit the config yourself | One tap to find a working one |
+| Size | Ships Pillow / lxml / calibre / evdev (tens of MB) | 13 Lua files, about 130 KB |
+| UI | Draws onto the framebuffer itself | Native KOReader widgets — IME, paging and gestures all come free |
+
+It also adds rankings, popular picks, chapter group switching, multi-select downloads, a bookshelf
+and reading-position memory.
+
+## Installing
+
+Copy the whole `kocomic.koplugin` folder into KOReader's plugins directory:
+
+- Kindle: `/mnt/us/koreader/plugins/kocomic.koplugin`
+- Kobo: `/mnt/onboard/.adds/koreader/plugins/kocomic.koplugin`
+- Android: `/sdcard/koreader/plugins/kocomic.koplugin`
+
+Restart KOReader. The entry point is **File manager → magnifier (search) menu → 看漫画 KoComic**.
+You can also bind `看漫画 KoComic` to a gesture in the gesture manager.
+
+## Using it
+
+**Home**: search / latest updates / popular / rankings (day, week, month, all time) / my favourites
+(login required) / my bookshelf / settings.
+
+**Open a chapter** and there are three ways to go:
+
+- **Read online (streaming)** — no waiting for the whole chapter; it fetches as you turn, and pages
+  you have read stay in the cache
+- **Download this chapter / download N chapters from here** — packed into CBZ
+- **Long-press a chapter** = multi-select, tick several and fetch them together
+
+**In the online reader**: tap the left or right edge to turn pages, tap the middle for the menu
+(previous chapter / next chapter / jump / change layout mode / save this chapter as CBZ / exit).
+Hardware page keys and left-right swipes work too. It remembers where you stopped and resumes there.
+
+**While downloading**, progress is shown on screen and a tap aborts it; images already fetched are
+kept, and the next run picks up where it left off.
+
+## Reading progress from your account
+
+Once you are logged in, the plugin reads your account's record via
+`/api/v3/comic2/{comic}/query` (the one the CopyManga app or website synced there) and shows it in
+three places:
+
+- **Favourites list**: each title is tagged "read up to ch. 12" (falling back to "latest ch. 20" or
+  the author when there is no progress)
+- **Comic detail page**: the subtitle gains "· read up to ch. 12"
+- **Chapter list**: that chapter is marked "you are here", and the top-left menu has "jump to the
+  chapter you last read"
+
+Without a login nothing is shown — the server returns `collect` and `browse` empty rather than an
+error. Clients spell the fields differently (`last_browse.last_browse_name`, `browse.chapter_name`
+and `chapter_uuid` have all been seen in the wild) and the plugin accepts all of them; anything it
+cannot parse is treated as absent and never breaks the page.
+
+> Note: I don't have a CopyManga account, so I could only verify against logged-out responses that
+> this doesn't crash and that the field parsing is right. How it actually looks once logged in still
+> needs a check on a real device. Progress is **read-only** — the plugin never writes back.
+
+## Roasts at the end of a chapter
+
+CopyManga calls its chapter comments "roasts" (吐槽). The endpoint is
+`/api/v3/roasts?chapter_id=…`, it is **readable without logging in**, returns at most 100 at a time,
+and popular chapters easily run into the hundreds.
+
+By default the plugin **appends that chapter's roasts after its last page**: typeset as book pages,
+username and date in small type on one line, the comment below, each separated by a thin rule, with
+"roasts 1/2" in the bottom-right corner.
+
+- **Online reading**: keep turning past the last page and you are in the roasts, with "chapter
+  roasts" in the footer
+- **Downloaded CBZ**: appended at the end of that chapter, filenames sorted after the pages; text
+  pages are stored as PNG (sharper than JPEG, and smaller for this kind of content)
+- When several chapters are merged into one book, each chapter's roasts follow **its own chapter**
+  instead of piling up at the end
+
+You can switch this off in the settings, or change the cap (default 40, roughly 2–3 pages per
+chapter). If roasts can't be fetched — network trouble, an API change — they are skipped silently and
+the chapter itself is unaffected.
+
+## When the API domain changes
+
+CopyManga rotates its API domains. The plugin has a one-tap recovery:
+**Settings → API domain → find a working domain automatically**. It also offers to run this for you
+when a request fails with "cannot reach the API".
+
+It probes candidates one at a time and stops at the first hit (tap the screen to abort): first it
+confirms whether the current one is genuinely down, then it retries **ones that worked before** (kept
+in the settings, and switchable from the menu), then clues read out of the API's own responses, and
+finally a set of built-in candidates. More than one domain is usually alive at any given moment, so
+working through the list does pay off — in testing, pointing the plugin at a domain that does not
+exist had it recovered on the second attempt.
+
+Typing one in by hand works too: paste a full URL like `https://api.xxx.com/` and it is trimmed down
+to the host.
+
+> Note: **the rate-limit error (210) is not a domain problem.** It is applied per IP for about an
+> hour and covers every domain at once, so on a 210 the plugin only tells you and will not go hunting
+> for a new domain.
+
+## Settings
+
+| Setting | What it does |
+|---|---|
+| Account | Needed for favourites; some chapters also require a login |
+| API domain | Auto-find / type one in / switch back to one that worked |
+| Find a working API automatically | Tap it when the domain has changed; probes and switches over |
+| Image quality | Sharp 1500px (default) / data-saving 800px |
+| Layout mode | Auto-detect (recommended) / always webtoon / always single-page |
+| Split double-page spreads | Right→left (manga order, default) / left→right / don't split |
+| Re-encoded image quality | Only affects pages re-cut from webtoons; single-page manga keeps the original file |
+| Page size | Defaults to the current screen. Re-download if you switch devices |
+| Auto levels (de-grey) | Stretches the black and white points per image, on by default; images that are already crisp are left alone |
+| De-grey originals too | Single-page manga keeps its original file by default; enable this to re-encode |
+| Contrast | The gamma written into the book, default 1.5 (KOReader's own default is 1.0) |
+| Append chapter roasts | On by default; adds the chapter comments after each chapter |
+| Roast cap | Default 40, about 2–3 pages |
+| Chapters per CBZ | 1 = one chapter per file; raise it to merge |
+| Download directory | Defaults to "home/漫画" |
+| Fix reading settings on the shelf | Writes "fit page" into books downloaded earlier |
+| Clear image cache / forget download records | |
+
+## Things to know
+
+- **The API domain changes without warning.** If you get "network unavailable" or endless loading,
+  go change the domain in the settings first.
+- **Rate limiting (error 210)**: happens when the API is having a moment, or when you aren't logged
+  in. Wait a while, or log into an account.
+- CopyManga serves **traditional Chinese** titles by default — that's the data source, not the plugin.
+- Downloading and streaming are both single-threaded; a 90-image chapter takes a few minutes with a
+  spinner on screen. That is normal for a KOReader plugin.
+- The plugin hosts no comics of its own; everything comes from CopyManga's public API.
+
+## Layout
+
+```
+kocomic.koplugin/
+├── _meta.lua              plugin metadata
+├── main.lua               entry point: registers the menu and gestures
+└── kocomic/
+    ├── config.lua         settings, directories, page size
+    ├── api.lua            CopyManga API (search / detail / chapters / images / login / favourites)
+    ├── imgheader.lua      image dimensions straight from the file header (pure Lua)
+    ├── imageutil.lua      decode / scale / stitch / sample / write JPEG (the only layer touching FFI)
+    ├── levels.lua         auto levels: histogram → lookup table (pure Lua)
+    ├── comments.lua       typesets the chapter's roasts into book pages
+    ├── hostfinder.lua     finds a working API domain when the old one dies
+    ├── pager.lua          layout engine: type detection + re-cutting + seam finding + de-greying
+    ├── reader.lua         the streaming online reader
+    ├── cbz.lua            packs CBZ files via libarchive
+    ├── downloader.lua     download scheduling, packing, reading settings, bookkeeping
+    └── browser.lua        UI: home / lists / detail / bookshelf / settings
+test/                      smoke tests that run on a PC (no device needed)
+```
+
+## Development: testing without a device
+
+`test/` holds a smoke-test suite: lupa starts a real Lua runtime, `stubs.lua` impersonates KOReader,
+HTTP, zip and file I/O are handed to Python, and **the imaging layer is swapped for Pillow** — so the
+layout engine runs real code against real data.
+
+```bash
+pip install lupa pillow
+python test/run_test.py                      # main flow: detection / re-cutting / roasts / download / reader
+python test/run_test.py scenario_ui.lua      # UI skeleton and settings only
+python test/run_test.py scenario_host.lua    # domain auto-discovery only
+```
+
+The main flow hits a fair number of data endpoints and **will trip the rate limit if you run it a few
+times back to back** (CopyManga limits per IP for about an hour, across every domain at once); when
+that happens it says 210 plainly instead of dumping garbage. The other two suites hit very few
+endpoints and can be run any time.
+
+It runs type detection against three real comics (webtoon / double-page scan / single-page), checks
+that re-cut webtoon pages come out exactly one screen tall, that single-page manga keeps its original
+files, and that generated books carry the reading settings; then it walks the online reader's paging,
+unpacks the resulting CBZ and reports the dimensions, and exports a few pages as PNG into
+`test/_pages/` for eyeballing.
+
+One detail about the test environment: the Windows C runtime can't handle UTF-8 paths (the output
+filenames are all Chinese), so the stubs route `os.rename/os.remove/io.open` through Python. Real
+devices run Linux and don't have this problem.
+
+## Licence
+
+Ported from kComics (by lxdklp, GPL-3.0), so this plugin is likewise released under **GPL-3.0** —
+see `LICENSE`.
